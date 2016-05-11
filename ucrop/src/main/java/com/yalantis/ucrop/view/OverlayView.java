@@ -21,7 +21,7 @@ import com.yalantis.ucrop.util.RectUtils;
 
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
- * <p/>
+ * <p>
  * This view is used for drawing the overlay on top of the image. It may have frame, crop guidelines and dimmed area.
  * This must have LAYER_TYPE_SOFTWARE to draw itself properly.
  */
@@ -252,7 +252,8 @@ public class OverlayView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawDimmedLayer(canvas);
-        drawCropGrid(canvas);
+        //drawCropGrid(canvas);
+        drawCropArea(canvas);
     }
 
     @Override
@@ -425,6 +426,31 @@ public class OverlayView extends View {
 
             canvas.restore();
         }
+    }
+
+    protected void drawCropArea(@NonNull Canvas canvas) {
+        float[] pts = new float[16];
+        pts[0] = mCropViewRect.centerX();
+        pts[1] = mCropViewRect.top;
+        pts[2] = mCropViewRect.right;
+        pts[3] = mCropViewRect.centerY();
+
+        pts[4] = mCropViewRect.right;
+        pts[5] = mCropViewRect.centerY();
+        pts[6] = mCropViewRect.centerX();
+        pts[7] = mCropViewRect.bottom;
+
+        pts[8] = mCropViewRect.centerX();
+        pts[9] = mCropViewRect.bottom;
+        pts[10] = mCropViewRect.left;
+        pts[11] = mCropViewRect.centerY();
+
+        pts[12] = mCropViewRect.left;
+        pts[13] = mCropViewRect.centerY();
+        pts[14] = mCropViewRect.centerX();
+        pts[15] = mCropViewRect.top;
+
+        canvas.drawLines(pts, mCropGridPaint);
     }
 
     /**
