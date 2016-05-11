@@ -375,7 +375,7 @@ public class OverlayView extends View {
         canvas.restore();
 
         if (mOvalDimmedLayer) { // Draw 1px stroke to fix antialias
-            canvas.drawOval(mCropViewRect, mDimmedStrokePaint);
+            //canvas.drawOval(mCropViewRect, mDimmedStrokePaint);
         }
     }
 
