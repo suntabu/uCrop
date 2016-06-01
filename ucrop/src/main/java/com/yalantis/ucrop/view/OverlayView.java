@@ -21,11 +21,16 @@ import com.yalantis.ucrop.util.RectUtils;
 
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
- * <p>
+ * <p/>
  * This view is used for drawing the overlay on top of the image. It may have frame, crop guidelines and dimmed area.
  * This must have LAYER_TYPE_SOFTWARE to draw itself properly.
  */
 public class OverlayView extends View {
+
+    public static final int CROP_AREA_SHAPE_CIRCLE = 0;
+    public static final int CROP_AREA_SHAPE_DIAMOND = 1;
+    public static final int CROP_AREA_SHAPE_RECT = 2;
+
 
     public static final boolean DEFAULT_SHOW_CROP_FRAME = true;
     public static final boolean DEFAULT_SHOW_CROP_GRID = true;
@@ -33,6 +38,7 @@ public class OverlayView extends View {
     public static final boolean DEFAULT_FREESTYLE_CROP_ENABLED = false;
     public static final int DEFAULT_CROP_GRID_ROW_COUNT = 2;
     public static final int DEFAULT_CROP_GRID_COLUMN_COUNT = 2;
+    public static final int DEFAULT_CROP_SHAPE = CROP_AREA_SHAPE_RECT;
 
     private final RectF mCropViewRect = new RectF();
     private final RectF mTempRect = new RectF();
@@ -41,9 +47,10 @@ public class OverlayView extends View {
     private float mTargetAspectRatio;
     private float[] mGridPoints = null;
     private boolean mShowCropFrame, mShowCropGrid;
+    private int mCropShape;
     private boolean mOvalDimmedLayer;
     private int mDimmedColor;
-    private Path mCircularPath = new Path();
+    private Path mCropAreaPath = new Path();
     private Paint mDimmedStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mCropGridPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mCropFramePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -219,15 +226,27 @@ public class OverlayView extends View {
 
     private void updateGridPoints() {
         mCropGridCorners = RectUtils.getCornersFromRect(mCropViewRect);
-
         mGridPoints = null;
-        mCircularPath.reset();
-//        mCircularPath.addOval(mCropViewRect, Path.Direction.CW);
-        mCircularPath.moveTo(mCropViewRect.centerX(), mCropViewRect.top);
-        mCircularPath.lineTo(mCropViewRect.right, mCropViewRect.centerY());
-        mCircularPath.lineTo(mCropViewRect.centerX(), mCropViewRect.bottom);
-        mCircularPath.lineTo(mCropViewRect.left, mCropViewRect.centerY());
-        mCircularPath.close();
+        mCropAreaPath.reset();
+
+
+        if (mCropShape == CROP_AREA_SHAPE_CIRCLE) {
+            mCropAreaPath.addOval(mCropViewRect, Path.Direction.CW);
+        } else if (mCropShape == CROP_AREA_SHAPE_RECT) {
+            mCropAreaPath.moveTo(mCropViewRect.left, mCropViewRect.top);
+            mCropAreaPath.lineTo(mCropViewRect.right, mCropViewRect.top);
+            mCropAreaPath.lineTo(mCropViewRect.right, mCropViewRect.bottom);
+            mCropAreaPath.lineTo(mCropViewRect.left, mCropViewRect.bottom);
+            mCropAreaPath.close();
+        } else if (mCropShape == CROP_AREA_SHAPE_DIAMOND) {
+            mCropAreaPath.moveTo(mCropViewRect.centerX(), mCropViewRect.top);
+            mCropAreaPath.lineTo(mCropViewRect.right, mCropViewRect.centerY());
+            mCropAreaPath.lineTo(mCropViewRect.centerX(), mCropViewRect.bottom);
+            mCropAreaPath.lineTo(mCropViewRect.left, mCropViewRect.centerY());
+            mCropAreaPath.close();
+        }
+
+
     }
 
     protected void init() {
@@ -366,17 +385,13 @@ public class OverlayView extends View {
      */
     protected void drawDimmedLayer(@NonNull Canvas canvas) {
         canvas.save();
-        if (mOvalDimmedLayer) {
-            canvas.clipPath(mCircularPath, Region.Op.DIFFERENCE);
-        } else {
-            canvas.clipRect(mCropViewRect, Region.Op.DIFFERENCE);
-        }
+        canvas.clipPath(mCropAreaPath, Region.Op.DIFFERENCE);
         canvas.drawColor(mDimmedColor);
         canvas.restore();
 
-        if (mOvalDimmedLayer) { // Draw 1px stroke to fix antialias
+       /* if (mOvalDimmedLayer) { // Draw 1px stroke to fix antialias
             //canvas.drawOval(mCropViewRect, mDimmedStrokePaint);
-        }
+        }*/
     }
 
     /**
@@ -434,7 +449,7 @@ public class OverlayView extends View {
     }
 
     protected void drawCropArea(@NonNull Canvas canvas) {
-        float[] pts = new float[16];
+       /* float[] pts = new float[16];
         pts[0] = mCropViewRect.centerX();
         pts[1] = mCropViewRect.top;
         pts[2] = mCropViewRect.right;
@@ -455,7 +470,9 @@ public class OverlayView extends View {
         pts[14] = mCropViewRect.centerX();
         pts[15] = mCropViewRect.top;
 
-        canvas.drawLines(pts, mCropGridPaint);
+        canvas.drawLines(pts, mCropGridPaint);*/
+
+        canvas.drawPath(mCropAreaPath, mCropGridPaint);
     }
 
     /**
@@ -476,6 +493,8 @@ public class OverlayView extends View {
 
         initCropGridStyle(a);
         mShowCropGrid = a.getBoolean(R.styleable.ucrop_UCropView_ucrop_show_grid, DEFAULT_SHOW_CROP_GRID);
+
+        mCropShape = a.getInt(R.styleable.ucrop_UCropView_ucrop_crop_shape, DEFAULT_CROP_SHAPE);
     }
 
     /**
@@ -512,4 +531,7 @@ public class OverlayView extends View {
         mCropGridColumnCount = a.getInt(R.styleable.ucrop_UCropView_ucrop_grid_column_count, DEFAULT_CROP_GRID_COLUMN_COUNT);
     }
 
+    public void setCropShape(int mCropShape) {
+        this.mCropShape = mCropShape;
+    }
 }

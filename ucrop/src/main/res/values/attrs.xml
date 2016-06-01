@@ -21,6 +21,8 @@
         <attr name="ucrop_frame_color" format="color"/>
         <attr name="ucrop_show_frame" format="boolean"/>
 
+
+        <attr name="ucrop_crop_shape" format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="ucrop_AspectRatioTextView">

@@ -255,6 +255,8 @@ public class UCropActivity extends AppCompatActivity {
         mOverlayView.setCropGridColumnCount(intent.getIntExtra(UCrop.Options.EXTRA_CROP_GRID_COLUMN_COUNT, OverlayView.DEFAULT_CROP_GRID_COLUMN_COUNT));
         mOverlayView.setCropGridColor(intent.getIntExtra(UCrop.Options.EXTRA_CROP_GRID_COLOR, getResources().getColor(R.color.ucrop_color_default_crop_grid)));
         mOverlayView.setCropGridStrokeWidth(intent.getIntExtra(UCrop.Options.EXTRA_CROP_GRID_STROKE_WIDTH, getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_grid_stoke_width)));
+
+        mOverlayView.setCropShape(intent.getIntExtra(UCrop.Options.EXTRA_UCROP_CROP_SHAPE,OverlayView.CROP_AREA_SHAPE_RECT));
     }
 
     private void setupViews(@NonNull Intent intent) {

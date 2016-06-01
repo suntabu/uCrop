@@ -243,6 +243,7 @@ public class UCrop {
 
         public static final String EXTRA_HIDE_BOTTOM_CONTROLS = EXTRA_PREFIX + ".HideBottomControls";
         public static final String EXTRA_FREE_STYLE_CROP = EXTRA_PREFIX + ".FreeStyleCrop";
+        public static final String EXTRA_UCROP_CROP_SHAPE = EXTRA_PREFIX+".CropShape";
 
 
         private final Bundle mOptionBundle;
@@ -325,6 +326,10 @@ public class UCrop {
          */
         public void setShowCropFrame(boolean show) {
             mOptionBundle.putBoolean(EXTRA_SHOW_CROP_FRAME, show);
+        }
+
+        public void setCropShape(int shape) {
+            mOptionBundle.putInt(EXTRA_UCROP_CROP_SHAPE, shape);
         }
 
         /**
