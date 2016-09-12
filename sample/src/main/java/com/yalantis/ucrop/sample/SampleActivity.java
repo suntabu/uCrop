@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.UCropActivity;
+import com.yalantis.ucrop.view.OverlayView;
 
 import java.io.File;
 import java.util.Locale;
@@ -270,7 +271,7 @@ public class SampleActivity extends BaseActivity {
 
         options.setHideBottomControls(mCheckBoxHideBottomControls.isChecked());
         options.setFreeStyleCropEnabled(mCheckBoxFreeStyleCrop.isChecked());
-
+        options.setCropShape(OverlayView.CROP_AREA_SHAPE_RECT);
         /*
         If you want to configure how gestures work for all UCropActivity tabs
 
