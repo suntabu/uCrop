@@ -14,6 +14,8 @@ import android.util.AttributeSet;
 import com.yalantis.ucrop.R;
 import com.yalantis.ucrop.callback.BitmapCropCallback;
 import com.yalantis.ucrop.callback.CropBoundsChangeListener;
+import com.yalantis.ucrop.model.CropParameters;
+import com.yalantis.ucrop.model.ImageState;
 import com.yalantis.ucrop.task.BitmapCropTask;
 import com.yalantis.ucrop.util.CubicEasing;
 import com.yalantis.ucrop.util.RectUtils;
@@ -71,12 +73,16 @@ public class CropImageView extends TransformImageView {
         cancelAllAnimations();
         setImageToWrapCropBounds(false);
 
-        new BitmapCropTask(getViewBitmap(), mCropRect, RectUtils.trapToRect(mCurrentImageCorners),
-                getCurrentScale(), getCurrentAngle(),
+        final ImageState imageState = new ImageState(
+                mCropRect, RectUtils.trapToRect(mCurrentImageCorners),
+                getCurrentScale(), getCurrentAngle());
+
+        final CropParameters cropParameters = new CropParameters(
                 mMaxResultImageSizeX, mMaxResultImageSizeY,
                 compressFormat, compressQuality,
-                getImageInputPath(), getImageOutputPath(),
-                cropCallback).execute();
+                getImageInputPath(), getImageOutputPath(), getExifInfo());
+
+        new BitmapCropTask(getViewBitmap(), imageState, cropParameters, cropCallback).execute();
     }
 
     /**
@@ -107,6 +113,7 @@ public class CropImageView extends TransformImageView {
      * @param cropRect - new crop rectangle
      */
     public void setCropRect(RectF cropRect) {
+        mTargetAspectRatio = cropRect.width() / cropRect.height();
         mCropRect.set(cropRect.left - getPaddingLeft(), cropRect.top - getPaddingTop(),
                 cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
         calculateImageScaleBounds();
@@ -454,10 +461,10 @@ public class CropImageView extends TransformImageView {
      * @param drawableHeight - image height
      */
     private void calculateImageScaleBounds(float drawableWidth, float drawableHeight) {
-        float widthScale = mCropRect.width() / drawableWidth;
-        float heightScale = mCropRect.height() / drawableHeight;
+        float widthScale = Math.min(mCropRect.width() / drawableWidth, mCropRect.width() / drawableHeight);
+        float heightScale = Math.min(mCropRect.height() / drawableHeight, mCropRect.height() / drawableWidth);
 
-        mMinScale = Math.max(widthScale, heightScale);
+        mMinScale = Math.min(widthScale, heightScale);
         mMaxScale = mMinScale * mMaxScaleMultiplier;
     }
 
@@ -472,11 +479,16 @@ public class CropImageView extends TransformImageView {
         float cropRectWidth = mCropRect.width();
         float cropRectHeight = mCropRect.height();
 
-        float tw = (cropRectWidth - drawableWidth * mMinScale) / 2.0f + mCropRect.left;
-        float th = (cropRectHeight - drawableHeight * mMinScale) / 2.0f + mCropRect.top;
+        float widthScale = mCropRect.width() / drawableWidth;
+        float heightScale = mCropRect.height() / drawableHeight;
+
+        float initialMinScale = Math.max(widthScale, heightScale);
+
+        float tw = (cropRectWidth - drawableWidth * initialMinScale) / 2.0f + mCropRect.left;
+        float th = (cropRectHeight - drawableHeight * initialMinScale) / 2.0f + mCropRect.top;
 
         mCurrentImageMatrix.reset();
-        mCurrentImageMatrix.postScale(mMinScale, mMinScale);
+        mCurrentImageMatrix.postScale(initialMinScale, initialMinScale);
         mCurrentImageMatrix.postTranslate(tw, th);
         setImageMatrix(mCurrentImageMatrix);
     }

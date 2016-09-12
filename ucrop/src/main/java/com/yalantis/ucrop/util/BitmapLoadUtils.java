@@ -3,12 +3,17 @@ package com.yalantis.ucrop.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.yalantis.ucrop.callback.BitmapLoadCallback;
 import com.yalantis.ucrop.task.BitmapLoadTask;
@@ -25,7 +30,7 @@ public class BitmapLoadUtils {
     private static final String TAG = "BitmapLoadUtils";
 
     public static void decodeBitmapInBackground(@NonNull Context context,
-                                                @Nullable Uri uri, @Nullable Uri outputUri,
+                                                @NonNull Uri uri, @Nullable Uri outputUri,
                                                 int requiredWidth, int requiredHeight,
                                                 BitmapLoadCallback loadCallback) {
 
@@ -35,8 +40,7 @@ public class BitmapLoadUtils {
     public static Bitmap transformBitmap(@NonNull Bitmap bitmap, @NonNull Matrix transformMatrix) {
         try {
             Bitmap converted = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), transformMatrix, true);
-            if (bitmap != converted) {
-                bitmap.recycle();
+            if (!bitmap.sameAs(converted)) {
                 bitmap = converted;
             }
         } catch (OutOfMemoryError error) {
@@ -110,6 +114,49 @@ public class BitmapLoadUtils {
                 translation = 1;
         }
         return translation;
+    }
+
+    /**
+     * This method calculates maximum size of both width and height of bitmap.
+     * It is twice the device screen diagonal for default implementation (extra quality to zoom image).
+     * Size cannot exceed max texture size.
+     *
+     * @return - max bitmap size in pixels.
+     */
+    @SuppressWarnings({"SuspiciousNameCombination", "deprecation"})
+    public static int calculateMaxBitmapSize(@NonNull Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+
+        Point size = new Point();
+        int width, height;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            display.getSize(size);
+            width = size.x;
+            height = size.y;
+        } else {
+            width = display.getWidth();
+            height = display.getHeight();
+        }
+
+        // Twice the device screen diagonal as default
+        int maxBitmapSize = (int) Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+
+        // Check for max texture size via Canvas
+        Canvas canvas = new Canvas();
+        final int maxCanvasSize = Math.min(canvas.getMaximumBitmapWidth(), canvas.getMaximumBitmapHeight());
+        if (maxCanvasSize > 0) {
+            maxBitmapSize = Math.min(maxBitmapSize, maxCanvasSize);
+        }
+
+        // Check for max texture size via GL
+        final int maxTextureSize = EglUtils.getMaxTextureSize();
+        if (maxTextureSize > 0) {
+            maxBitmapSize = Math.min(maxBitmapSize, maxTextureSize);
+        }
+
+        Log.d(TAG, "maxBitmapSize: " + maxBitmapSize);
+        return maxBitmapSize;
     }
 
     @SuppressWarnings("ConstantConditions")
