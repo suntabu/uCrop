@@ -449,7 +449,7 @@ public class OverlayView extends View {
         if (mCircleDimmedLayer) {
             canvas.clipPath(mCircularPath, Region.Op.DIFFERENCE);
         } else {
-            canvas.clipRect(mCropViewRect, Region.Op.DIFFERENCE);
+            canvas.clipPath(mCropAreaPath, Region.Op.DIFFERENCE);
         }
         canvas.clipPath(mCropAreaPath, Region.Op.DIFFERENCE);
         canvas.drawColor(mDimmedColor);

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 
 import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.UCropActivity;
+import com.yalantis.ucrop.model.AspectRatio;
+import com.yalantis.ucrop.view.CropImageView;
 import com.yalantis.ucrop.view.OverlayView;
 
 import java.io.File;
@@ -289,32 +292,33 @@ public class SampleActivity extends BaseActivity {
        /*
 ``
         Tune everything (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
+  */
 
         options.setMaxScaleMultiplier(5);
         options.setImageToCropBoundsAnimDuration(666);
         options.setDimmedLayerColor(Color.CYAN);
-        options.setCircleDimmedLayer(true);
+        options.setCircleDimmedLayer(false);
         options.setShowCropFrame(false);
         options.setCropGridStrokeWidth(20);
-        options.setCropGridColor(Color.GREEN);
+//        options.setCropGridColor(Color.GREEN);
         options.setCropGridColumnCount(2);
         options.setCropGridRowCount(1);
+        options.setCropShape(OverlayView.CROP_AREA_SHAPE_DIAMOND);
 
-        // Color palette
+  /*      // Color palette
         options.setToolbarColor(ContextCompat.getColor(this, R.color.your_color_res));
         options.setStatusBarColor(ContextCompat.getColor(this, R.color.your_color_res));
         options.setActiveWidgetColor(ContextCompat.getColor(this, R.color.your_color_res));
-		options.setToolbarWidgetColor(ContextCompat.getColor(this, R.color.your_color_res));
+		options.setToolbarWidgetColor(ContextCompat.getColor(this, R.color.your_color_res));*/
 
-		// Aspect ratio options
+        // Aspect ratio options
         options.setAspectRatioOptions(1,
-            new AspectRatio("WOW", 1, 2),
-            new AspectRatio("MUCH", 3, 4),
-            new AspectRatio("RATIO", CropImageView.DEFAULT_ASPECT_RATIO, CropImageView.DEFAULT_ASPECT_RATIO),
-            new AspectRatio("SO", 16, 9),
-            new AspectRatio("ASPECT", 1, 1));
+                new AspectRatio("WOW", 1, 2),
+                new AspectRatio("MUCH", 3, 4),
+                new AspectRatio("RATIO", CropImageView.DEFAULT_ASPECT_RATIO, CropImageView.DEFAULT_ASPECT_RATIO),
+                new AspectRatio("SO", 16, 9),
+                new AspectRatio("ASPECT", 1, 1));
 
-       */
 
         return uCrop.withOptions(options);
     }
