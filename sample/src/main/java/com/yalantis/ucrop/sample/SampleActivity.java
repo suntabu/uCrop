@@ -290,26 +290,28 @@ public class SampleActivity extends BaseActivity {
 
 
        /*
-``
+
         Tune everything (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
-  */
 
         options.setMaxScaleMultiplier(5);
         options.setImageToCropBoundsAnimDuration(666);
         options.setDimmedLayerColor(Color.CYAN);
-        options.setCircleDimmedLayer(false);
+        options.setCircleDimmedLayer(true);
         options.setShowCropFrame(false);
         options.setCropGridStrokeWidth(20);
-//        options.setCropGridColor(Color.GREEN);
+        options.setCropGridColor(Color.GREEN);
         options.setCropGridColumnCount(2);
         options.setCropGridRowCount(1);
+        options.setToolbarCropDrawable(R.drawable.your_crop_icon);
+        options.setToolbarCancelDrawable(R.drawable.your_cancel_icon);
         options.setCropShape(OverlayView.CROP_AREA_SHAPE_DIAMOND);
 
-  /*      // Color palette
+        // Color palette
         options.setToolbarColor(ContextCompat.getColor(this, R.color.your_color_res));
         options.setStatusBarColor(ContextCompat.getColor(this, R.color.your_color_res));
         options.setActiveWidgetColor(ContextCompat.getColor(this, R.color.your_color_res));
-		options.setToolbarWidgetColor(ContextCompat.getColor(this, R.color.your_color_res));*/
+        options.setToolbarWidgetColor(ContextCompat.getColor(this, R.color.your_color_res));
+        options.setRootViewBackgroundColor(ContextCompat.getColor(this, R.color.your_color_res));
 
         // Aspect ratio options
         options.setAspectRatioOptions(1,
@@ -319,6 +321,7 @@ public class SampleActivity extends BaseActivity {
                 new AspectRatio("SO", 16, 9),
                 new AspectRatio("ASPECT", 1, 1));
 
+       */
 
         return uCrop.withOptions(options);
     }
